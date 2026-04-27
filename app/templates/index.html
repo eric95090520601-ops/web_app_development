@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm text-center">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold mb-3"><i class="bi bi-basket2"></i> 今天想煮點什麼？</h1>
+        <p class="col-md-8 mx-auto fs-5 text-muted">輸入你手邊的食材，或是想吃的菜色名稱，立刻尋找靈感！</p>
+        
+        <form class="d-flex justify-content-center mt-4 mx-auto" style="max-width: 600px;" action="{{ url_for('recipe.search') }}" method="GET">
+            <select class="form-select w-25 me-2 form-select-lg" onchange="this.nextElementSibling.name = this.value">
+                <option value="q">找菜名</option>
+                <option value="ingredient">找食材</option>
+            </select>
+            <input class="form-control form-control-lg me-2" type="search" placeholder="例如：番茄、雞蛋" name="q">
+            <button class="btn btn-primary btn-lg px-4" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+</div>
+
+<h3 class="mb-4"><i class="bi bi-stars text-warning"></i> 最新發布食譜</h3>
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+    {% for recipe in recent_recipes %}
+    <div class="col">
+        <div class="card h-100 recipe-card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-truncate">{{ recipe.title }}</h5>
+                <p class="card-text text-muted small"><i class="bi bi-person"></i> {{ recipe.author.username }}</p>
+                <p class="card-text text-truncate">{{ recipe.description or '無簡介' }}</p>
+                <p class="card-text"><small class="text-muted"><i class="bi bi-clock"></i> {{ recipe.created_at.strftime('%Y-%m-%d') }}</small></p>
+            </div>
+            <div class="card-footer bg-white border-0 text-end">
+                <a href="{{ url_for('recipe.detail', id=recipe.id) }}" class="btn btn-sm btn-outline-primary">查看詳情</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-muted">
+        <p>目前還沒有任何食譜，趕快來發布第一篇吧！</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

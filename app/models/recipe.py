@@ -1,7 +1,9 @@
 from datetime import datetime
 from app.models import db
+import logging
 
 class Recipe(db.Model):
+    """食譜資料表"""
     __tablename__ = 'recipes'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -18,24 +20,54 @@ class Recipe(db.Model):
 
     @classmethod
     def create(cls, user_id, title, ingredients, steps, description=None):
-        recipe = cls(user_id=user_id, title=title, ingredients=ingredients, steps=steps, description=description)
-        db.session.add(recipe)
-        db.session.commit()
-        return recipe
+        """新增一筆記錄"""
+        try:
+            recipe = cls(user_id=user_id, title=title, ingredients=ingredients, steps=steps, description=description)
+            db.session.add(recipe)
+            db.session.commit()
+            return recipe
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error creating recipe: {e}")
+            raise
 
     @classmethod
     def get_by_id(cls, recipe_id):
-        return cls.query.get(recipe_id)
+        """取得單筆記錄"""
+        try:
+            return cls.query.get(recipe_id)
+        except Exception as e:
+            logging.error(f"Error fetching recipe by id {recipe_id}: {e}")
+            return None
 
     @classmethod
     def get_all(cls):
-        return cls.query.order_by(cls.created_at.desc()).all()
+        """取得所有記錄"""
+        try:
+            return cls.query.order_by(cls.created_at.desc()).all()
+        except Exception as e:
+            logging.error(f"Error fetching all recipes: {e}")
+            return []
 
     def update(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-        db.session.commit()
+        """更新記錄"""
+        try:
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error updating recipe {self.id}: {e}")
+            return False
 
     def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+        """刪除記錄"""
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error deleting recipe {self.id}: {e}")
+            return False

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <h2 class="card-title fw-bold mb-4"><i class="bi bi-pencil-square"></i> 發布新食譜</h2>
+                
+                <form action="{{ url_for('recipe.create') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-bold">食譜名稱 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ title or '' }}" placeholder="例如：阿嬤的秘製滷肉" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-bold">簡介</label>
+                        <textarea class="form-control" id="description" name="description" rows="2" placeholder="簡單介紹這道菜的特色或故事...">{{ description or '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="ingredients" class="form-label fw-bold">食材清單 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="ingredients" name="ingredients" rows="4" placeholder="五花肉 600g&#10;醬油 3大匙&#10;冰糖 1大匙" required>{{ ingredients or '' }}</textarea>
+                        <div class="form-text">建議一行輸入一樣食材與份量。</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="steps" class="form-label fw-bold">烹飪步驟 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="steps" name="steps" rows="6" placeholder="1. 五花肉切塊川燙備用...&#10;2. 熱鍋炒香冰糖..." required>{{ steps or '' }}</textarea>
+                        <div class="form-text">請依序寫下每個烹調步驟。</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary px-4">取消</a>
+                        <button type="submit" class="btn btn-primary px-5">發布食譜</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold">
+        {% if ingredient %}包含「<span class="text-primary">{{ ingredient }}</span>」食材的食譜
+        {% elif q %}名稱包含「<span class="text-primary">{{ q }}</span>」的食譜
+        {% else %}所有食譜
+        {% endif %}
+    </h2>
+    <p class="text-muted">共找到 {{ recipes|length }} 筆結果</p>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for recipe in recipes %}
+    <div class="col">
+        <div class="card h-100 recipe-card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title">{{ recipe.title }}</h5>
+                <p class="card-text text-muted small"><i class="bi bi-person"></i> {{ recipe.author.username }}</p>
+                <p class="card-text text-truncate">{{ recipe.description or '無簡介' }}</p>
+                <div class="mb-2">
+                    <span class="badge bg-secondary">食材</span> 
+                    <small class="text-truncate d-inline-block w-75 align-bottom">{{ recipe.ingredients }}</small>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 text-end">
+                <a href="{{ url_for('recipe.detail', id=recipe.id) }}" class="btn btn-sm btn-outline-primary">查看詳情</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <div class="text-muted mb-3 fs-1"><i class="bi bi-search"></i></div>
+        <h4>找不到相關食譜</h4>
+        <p class="text-muted">換個關鍵字試試看吧！</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

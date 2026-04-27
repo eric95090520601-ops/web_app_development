@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- 左側：食譜內容 -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h1 class="card-title fw-bold">{{ recipe.title }}</h1>
+                    {% if session.get('user_id') %}
+                        <form action="{{ url_for('recipe.collect', id=recipe.id) }}" method="POST">
+                            {% if is_collected %}
+                            <button type="submit" class="btn btn-warning"><i class="bi bi-star-fill"></i> 已收藏</button>
+                            {% else %}
+                            <button type="submit" class="btn btn-outline-warning"><i class="bi bi-star"></i> 收藏</button>
+                            {% endif %}
+                        </form>
+                    {% endif %}
+                </div>
+                
+                <div class="text-muted mb-4 pb-3 border-bottom">
+                    <span class="me-3"><i class="bi bi-person"></i> {{ recipe.author.username }}</span>
+                    <span><i class="bi bi-clock"></i> {{ recipe.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    
+                    {% if session.get('user_id') == recipe.user_id %}
+                    <div class="float-end">
+                        <a href="{{ url_for('recipe.edit', id=recipe.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> 編輯</a>
+                        <form action="{{ url_for('recipe.delete', id=recipe.id) }}" method="POST" class="d-inline" onsubmit="return confirm('確定要刪除這篇食譜嗎？');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> 刪除</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if recipe.description %}
+                <div class="mb-4 lead text-secondary">
+                    {{ recipe.description }}
+                </div>
+                {% endif %}
+
+                <h4 class="fw-bold mt-4 mb-3"><i class="bi bi-basket text-success"></i> 準備食材</h4>
+                <div class="bg-light p-3 rounded mb-4">
+                    <p style="white-space: pre-wrap;">{{ recipe.ingredients }}</p>
+                </div>
+
+                <h4 class="fw-bold mt-4 mb-3"><i class="bi bi-list-ol text-primary"></i> 烹飪步驟</h4>
+                <div class="p-2">
+                    <p style="white-space: pre-wrap;">{{ recipe.steps }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右側：留言板 -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-chat-dots"></i> 留言交流 ({{ recipe.comments|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if session.get('user_id') %}
+                <form action="{{ url_for('comment.create_comment', recipe_id=recipe.id) }}" method="POST" class="mb-4">
+                    <div class="mb-2">
+                        <textarea class="form-control" name="content" rows="2" placeholder="寫下你的試做心得或發問..." required></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-sm btn-primary">送出留言</button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-secondary py-2 text-center">
+                    <a href="{{ url_for('auth.login') }}" class="text-decoration-none">登入後即可留言</a>
+                </div>
+                {% endif %}
+
+                <div class="comments-list">
+                    {% for comment in recipe.comments|sort(attribute='created_at', reverse=True) %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold">{{ comment.author.username }}</span>
+                            <small class="text-muted">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <p class="mb-0 text-break">{{ comment.content }}</p>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3 mb-0">目前還沒有留言，來搶頭香吧！</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
